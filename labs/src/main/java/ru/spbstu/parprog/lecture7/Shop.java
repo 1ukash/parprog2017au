@@ -6,7 +6,7 @@ import java.util.List;
 public class Shop {
 
 	private static final int PRODUCT_PRICE = 1;
-	private static final int CNT = 2;
+	private static final int CNT = 8;
 	private static final int START_CAPITAL = 50000000;
 
 	private static class Buyer implements Runnable {
@@ -20,9 +20,13 @@ public class Shop {
 		@Override
 		public void run() {
 			while (money >= s.getPrice() && s.getCnt() > 0 && !Thread.currentThread().isInterrupted()) {
-				s.setCnt(s.getCnt() - 1);
-				this.money -= s.getPrice();
-				s.setMoney(s.getMoney() + s.getPrice());
+				synchronized (s) {
+					if (money >= s.getPrice() && s.getCnt() > 0) {
+						s.setCnt(s.getCnt() - 1);
+						this.money -= s.getPrice();
+						s.setMoney(s.getMoney() + s.getPrice());
+					}
+				}
 			}
 		}
 
